@@ -42,3 +42,9 @@ yarn-error.log
 /data
 /config/caddy
 /config/composer
+/logs
+!/logs/.gitkeep
+/app-storage
+!/app-storage/.gitkeep
+/.env
+/laravel.env

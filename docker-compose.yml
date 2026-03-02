@@ -2,10 +2,22 @@ services:
   app:
     restart: always
     image: "solidtime/solidtime:${SOLIDTIME_IMAGE_TAG:-latest}"
-    user: "1001:1001"
-    ports:
-      - '${FORWARD_APP_PORT:-8001}:8001'
+    user: "1000:1000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${REVERSE_PROXY_NETWORK}"
+      - "traefik.http.services.solidtime.loadbalancer.server.port=8000"
+      # http
+      - "traefik.http.routers.solidtime.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.solidtime.entrypoints=web"
+      - "traefik.http.routers.solidtime.middlewares=redirect-to-https@file"
+      # https
+      - "traefik.http.routers.solidtime-https.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.solidtime-https.entrypoints=websecure"
+      - "traefik.http.routers.solidtime-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.solidtime-https.tls=true"
     networks:
+      - frontend
       - internal
     volumes:
       - "app-storage:/var/www/html/storage"
@@ -14,7 +26,7 @@ services:
     environment:
       CONTAINER_MODE: http
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://localhost:8001/health-check/up" ]
+      test: [ "CMD", "curl", "--fail", "http://localhost:8000/health-check/up" ]
     env_file:
       - laravel.env
     depends_on:
@@ -22,7 +34,7 @@ services:
   scheduler:
     restart: always
     image: "solidtime/solidtime:${SOLIDTIME_IMAGE_TAG:-latest}"
-    user: "1001:1001"
+    user: "1000:1000"
     networks:
       - internal
     volumes:
@@ -40,7 +52,7 @@ services:
   queue:
     restart: always
     image: "solidtime/solidtime:${SOLIDTIME_IMAGE_TAG:-latest}"
-    user: "1001:1001"
+    user: "1000:1000"
     networks:
       - internal
     volumes:
@@ -60,7 +72,7 @@ services:
     restart: always
     image: 'postgres:15'
 #    ports:
-#      - '${FORWARD_DB_PORT:-5432}:5432'
+#      - '${FORWARD_DB_PORT:-5433}:5433'
     environment:
       PGPASSWORD: '${DB_PASSWORD:-secret}'
       POSTGRES_DB: '${DB_DATABASE}'
@@ -88,6 +100,9 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "--silent", "--fail", "http://localhost:3000/health" ]
 networks:
+  frontend:
+    name: ${REVERSE_PROXY_NETWORK}
+    external: true
   internal:
 volumes:
   database-storage:
