@@ -86,7 +86,7 @@ class ImportDatabaseHelperTest extends TestCase
         $organization = Organization::factory()->create();
         $project = Project::factory()->forOrganization($organization)->create();
         $externalIdentifier1 = '12345';
-        $externalIdentifier2 = '54331';
+        $externalIdentifier2 = '54321';
         $helper = new ImportDatabaseHelper(Project::class, ['name', 'organization_id'], true);
         $helper->getKey([
             'name' => $project->name,
@@ -116,7 +116,7 @@ class ImportDatabaseHelperTest extends TestCase
         $organization = Organization::factory()->create();
         $project = Project::factory()->forOrganization($organization)->create();
         $externalIdentifier1 = '12345';
-        $externalIdentifier2 = '54331';
+        $externalIdentifier2 = '54321';
         $helper = new ImportDatabaseHelper(Project::class, ['name', 'organization_id'], true);
         $helper->getKey([
             'name' => $project->name,

@@ -4,7 +4,7 @@ services:
     image: "solidtime/solidtime:${SOLIDTIME_IMAGE_TAG:-latest}"
     user: "1000:1000"
     ports:
-      - '${FORWARD_APP_PORT:-8001}:8001'
+      - '${FORWARD_APP_PORT:-8000}:8000'
     networks:
       - internal
     volumes:
@@ -14,7 +14,7 @@ services:
     environment:
       CONTAINER_MODE: http
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://localhost:8001/health-check/up" ]
+      test: [ "CMD", "curl", "--fail", "http://localhost:8000/health-check/up" ]
     env_file:
       - laravel.env
     depends_on:
@@ -60,7 +60,7 @@ services:
     restart: always
     image: 'postgres:15'
 #    ports:
-#      - '${FORWARD_DB_PORT:-5433}:5433'
+#      - '${FORWARD_DB_PORT:-5432}:5432'
     environment:
       PGPASSWORD: '${DB_PASSWORD:-secret}'
       POSTGRES_DB: '${DB_DATABASE}'

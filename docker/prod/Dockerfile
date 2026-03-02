@@ -207,7 +207,7 @@ RUN mkdir -p \
 RUN cat .env
 #RUN php artisan env
 
-EXPOSE 8001
+EXPOSE 8000
 
 ENTRYPOINT ["start-container"]
 
